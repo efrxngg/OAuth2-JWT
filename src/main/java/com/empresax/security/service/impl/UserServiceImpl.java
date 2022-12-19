@@ -10,6 +10,7 @@ import com.empresax.security.repository.IUserRepository;
 import com.empresax.security.repository.IUserTokenRepository;
 import com.empresax.security.security.JwtManager;
 import com.empresax.security.service.IUserService;
+import com.empresax.security.util.RandomID;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements IUserService {
         if (userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail()) > 0)
             throw new GenericAlreadyExistsException("Use diferent username or email");
 
+        user.setUserId(RandomID.generate());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         var userEntity = userRepository.save(user);
 
@@ -57,7 +59,7 @@ public class UserServiceImpl implements IUserService {
                 .authorities(List.of(user.getRole()))
                 .build());
         return SignedInUser.builder()
-                .userId(user.getUserId().toString())
+                .userId(user.getUserId())
                 .username(user.getUsername())
                 .accessToken(token)
                 .build();
@@ -75,17 +77,19 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public SignedInUser getSignedInUser(UserEntity userEntity) {
-        userTokenRepository.deleteByUserFk(userEntity.getUserId());
+        userTokenRepository.deleteByUserUserId(userEntity.getUserId());
         return createSignedUserWithRefreshToken(userEntity);
     }
 
     @Override
+    @Transactional
     public Optional<SignedInUser> getAccessToken(RefreshToken refreshToken) {
         var userTokenEntity = userTokenRepository.findByRefreshToken(refreshToken.getRefreshToken())
-                .orElseThrow(() -> new InvalidRefreshToken("Invalid Token"));
+                .orElseThrow(InvalidRefreshToken::new);
 
-        var signedInUser = createSignedUserWithRefreshToken(userTokenEntity.getUserFk());
+        var signedInUser = createSignedUserWithRefreshToken(userTokenEntity.getUser());
         signedInUser.setRefreshToken(refreshToken.getRefreshToken());
 
         return Optional.of(signedInUser);
@@ -95,13 +99,13 @@ public class UserServiceImpl implements IUserService {
     public void removeRefreshToken(RefreshToken refreshToken) {
         userTokenRepository.findByRefreshToken(refreshToken.getRefreshToken()).ifPresentOrElse(
                 userTokenRepository::delete,
-                () -> {throw new InvalidRefreshToken("Invalid token");}
+                () -> {throw new InvalidRefreshToken();}
         );
     }
 
     private String createRefreshToken(UserEntity user) {
         String token = RandomStringUtils.randomAlphanumeric(128);
-        userTokenRepository.save(new UserTokenEntity(null, user, token));
+        userTokenRepository.save(new UserTokenEntity(RandomID.generate(), user, token));
         return token;
     }
 
