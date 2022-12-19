@@ -1,5 +1,11 @@
 package com.empresax.security.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -7,18 +13,9 @@ import javax.persistence.Converter;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -28,9 +25,8 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "user_id", updatable = false, nullable = false)
-    private UUID userId;
+    @Column(name = "user_id", updatable = false, nullable = false, columnDefinition = "varchar(16) not null")
+    private String userId;
 
     @NotNull(message = "User name is required.")
     @Column(name = "username")
