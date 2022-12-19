@@ -6,16 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.UUID;
+import java.util.Date;
 
-@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class SignedInUser implements Serializable {
+@Data
+public class ErrorMessage implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String refreshToken;
-    private String accessToken;
-    private String username;
-    private String userId;
+
+    private String msg;
+    private String path;
+
 }
