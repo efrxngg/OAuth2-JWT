@@ -24,7 +24,7 @@ import javax.validation.Valid;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
-@Tag(name = "User", description = "Operations for users")
+@Tag(name = "Auth", description = "Operations for users")
 @RestController
 @RequestMapping(value = "/api/v1/auth")
 @AllArgsConstructor
@@ -63,7 +63,6 @@ public class AuthRestController {
     }
 
     @PostMapping(value = "/refresh")
-    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<SignedInUser> getAccessToken(@Valid @RequestBody RefreshToken refreshToken) {
         return ok(userService.getAccessToken(refreshToken).orElseThrow(InvalidRefreshToken::new));
     }

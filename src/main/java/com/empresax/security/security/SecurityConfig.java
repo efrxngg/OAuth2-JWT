@@ -32,7 +32,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
@@ -40,6 +45,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.empresax.security.security.Constants.*;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -66,12 +73,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.httpBasic()
                 .disable().formLogin()
-                .disable().csrf().ignoringAntMatchers("/api/v1/**")
+                .disable().csrf().ignoringAntMatchers(API_URL_PREFIX)
                 .and().headers().frameOptions().sameOrigin()
                 .and().cors()
                 .and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**").permitAll() //oas3
-                .antMatchers(HttpMethod.POST, "/api/v1/auth/sign-up", "/api/v1/auth/sign-in").permitAll()
+                .antMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
+                .antMatchers(HttpMethod.POST, PUBLIC_AUTH_URLS).permitAll() //auth
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer(auth2Server -> auth2Server.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(getJwtAuthenticationConverter())))
@@ -81,8 +88,8 @@ public class SecurityConfig {
 
     private Converter<Jwt, AbstractAuthenticationToken> getJwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authorityConverter = new JwtGrantedAuthoritiesConverter();
-        authorityConverter.setAuthorityPrefix("ROLE_");
-        authorityConverter.setAuthoritiesClaimName("roles");
+        authorityConverter.setAuthorityPrefix(AUTHORITY_PREFIX);
+        authorityConverter.setAuthoritiesClaimName(ROLE_CLAIM);
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorityConverter);
         return converter;
@@ -167,7 +174,10 @@ public class SecurityConfig {
         encoders.put("pbkdf2pe", new Pbkdf2PasswordEncoder());
         encoders.put("argon2", new Argon2PasswordEncoder());
         encoders.put("script", new SCryptPasswordEncoder());
-        return new DelegatingPasswordEncoder(id, encoders, "[", "]");
+        return new DelegatingPasswordEncoder(ENCODER_ID, encoders, "[", "]");
     }
+
+    private static final String[] WITHLIST = {"/v3/api-docs/**", "/swagger-ui/**"};
+    private static final String[] PUBLIC_AUTH_URLS = {"/api/v1/auth/sign-up", "/api/v1/auth/sign-in", "/api/v1/auth/refresh"};
 
 }

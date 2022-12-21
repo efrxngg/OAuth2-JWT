@@ -67,13 +67,10 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserEntity findUserByUsername(String username) {
-        if (Strings.isBlank(username))
-            throw new UsernameNotFoundException("Invalid User");
-
         final String uname = username.trim();
 
-        return userRepository.findUserByUsername(uname).orElseThrow(() ->
-                new UsernameNotFoundException(String.format("Username %s not found", uname)));
+        return userRepository.findByUsernameOrEmail(uname).orElseThrow(() ->
+                new UsernameNotFoundException(String.format("Username or Email %s not found", uname)));
     }
 
     @Override
