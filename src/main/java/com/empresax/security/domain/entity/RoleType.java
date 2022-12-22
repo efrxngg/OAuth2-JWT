@@ -33,7 +33,7 @@ public enum RoleType implements GrantedAuthority {
         return authority;
     }
 
-    public class Const {
+    public static class Const {
         public static final String ADMIN = "ROLE_ADMIN";
         public static final String USER = "ROLE_USER";
     }

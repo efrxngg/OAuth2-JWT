@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -55,7 +55,7 @@ public class UserServiceImpl implements IUserService {
         var token = jwtManager.create(User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .authorities(List.of(user.getRole()))
+                .authorities(Objects.nonNull(user.getRole()) ? user.getRole().name() : "")
                 .build());
         return SignedInUser.builder()
                 .userId(user.getUserId())
