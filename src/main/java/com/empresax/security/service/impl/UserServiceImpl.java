@@ -85,7 +85,7 @@ public class UserServiceImpl implements IUserService {
         var userTokenEntity = userTokenRepository.findByRefreshToken(refreshToken.getRefreshToken())
                 .orElseThrow(InvalidRefreshToken::new);
 
-        var signedInUser = createSignedUserWithRefreshToken(userTokenEntity.getUser());
+        var signedInUser = createSignedInUser(userTokenEntity.getUser());
         signedInUser.setRefreshToken(refreshToken.getRefreshToken());
 
         return Optional.of(signedInUser);
