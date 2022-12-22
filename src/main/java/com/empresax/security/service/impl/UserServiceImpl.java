@@ -13,7 +13,6 @@ import com.empresax.security.service.IUserService;
 import com.empresax.security.util.RandomID;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

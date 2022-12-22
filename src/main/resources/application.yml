@@ -11,6 +11,6 @@ app:
   security:
     jwt:
       keystore-location: jwt-keystore.jks
-      keystore-password: password
+      keystore-password: root1234
       key-alias: jwt-sign-key
-      private-key-passphrase: password
+      private-key-passphrase: root1234
