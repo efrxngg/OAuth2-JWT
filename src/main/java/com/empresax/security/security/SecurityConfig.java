@@ -50,6 +50,11 @@ import static com.empresax.security.security.Constants.API_URL_PREFIX;
 import static com.empresax.security.security.Constants.AUTHORITY_PREFIX;
 import static com.empresax.security.security.Constants.ENCODER_ID;
 import static com.empresax.security.security.Constants.ROLE_CLAIM;
+import static com.empresax.security.security.Constants.SIGN_IN;
+import static com.empresax.security.security.Constants.SIGN_OUT;
+import static com.empresax.security.security.Constants.SIGN_UP;
+import static com.empresax.security.security.Constants.TOKEN_REFRESH;
+import static com.empresax.security.security.Constants.WITHLIST;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -82,7 +87,8 @@ public class SecurityConfig {
                 .and().cors()
                 .and().authorizeRequests()
                 .antMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
-                .antMatchers(HttpMethod.POST, PUBLIC_AUTH_URLS).permitAll() //auth
+                .antMatchers(HttpMethod.POST, SIGN_UP, SIGN_IN, TOKEN_REFRESH).permitAll() //auth
+                .antMatchers(HttpMethod.DELETE, SIGN_OUT).permitAll() //auth
                 .antMatchers("/api/v1/auth/admin").hasAuthority(RoleType.ADMIN.getAuthority())
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer(auth2Server -> auth2Server.jwt(
@@ -183,8 +189,5 @@ public class SecurityConfig {
         return new DelegatingPasswordEncoder(ENCODER_ID, encoders, "[", "]");
     }
 //    endregion
-
-    private static final String[] WITHLIST = {"/v3/api-docs/**", "/swagger-ui/**"};
-    private static final String[] PUBLIC_AUTH_URLS = {"/api/v1/auth/sign-up", "/api/v1/auth/sign-in", "/api/v1/auth/refresh"};
 
 }

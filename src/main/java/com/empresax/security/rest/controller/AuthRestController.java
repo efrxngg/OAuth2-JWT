@@ -13,11 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -61,8 +57,7 @@ public class AuthRestController {
         return ok(userService.getSignedInUser(userEntity));
     }
 
-    @PostMapping(value = "/sign-out")
-    @SecurityRequirement(name = "Bearer Authentication")
+    @DeleteMapping(value = "/sign-out")
     public ResponseEntity<Void> signOut(@Valid @RequestBody RefreshToken refreshToken) {
         userService.removeRefreshToken(refreshToken);
         return status(HttpStatus.OK).build();
