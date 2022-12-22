@@ -1,5 +1,6 @@
 package com.empresax.security.security;
 
+import com.empresax.security.domain.entity.RoleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,11 +43,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.empresax.security.security.Constants.*;
+import static com.empresax.security.security.Constants.API_URL_PREFIX;
+import static com.empresax.security.security.Constants.AUTHORITY_PREFIX;
+import static com.empresax.security.security.Constants.ENCODER_ID;
+import static com.empresax.security.security.Constants.ROLE_CLAIM;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -80,6 +83,7 @@ public class SecurityConfig {
                 .and().authorizeRequests()
                 .antMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
                 .antMatchers(HttpMethod.POST, PUBLIC_AUTH_URLS).permitAll() //auth
+                .antMatchers("/api/v1/auth/admin").hasAuthority(RoleType.ADMIN.getAuthority())
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer(auth2Server -> auth2Server.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(getJwtAuthenticationConverter())))
@@ -94,6 +98,11 @@ public class SecurityConfig {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorityConverter);
         return converter;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(RSAPublicKey rsaPublicKey) {
+        return NimbusJwtDecoder.withPublicKey(rsaPublicKey).build();
     }
 //    endregion
 
@@ -136,12 +145,7 @@ public class SecurityConfig {
         }
         throw new IllegalArgumentException("Unable to load public key");
     }
-
-    @Bean
-    public JwtDecoder jwtDecoder(RSAPublicKey rsaPublicKey) {
-        return NimbusJwtDecoder.withPublicKey(rsaPublicKey).build();
-    }
-//    endregion  Configs
+//    endregion
 
     //region CORS CONFIG
     @Bean
@@ -171,12 +175,11 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        String id = "x";
-        Map<String, PasswordEncoder> encoders = new HashMap<>();
-        encoders.put(id, new BCryptPasswordEncoder());
-        encoders.put("pbkdf2pe", new Pbkdf2PasswordEncoder());
-        encoders.put("argon2", new Argon2PasswordEncoder());
-        encoders.put("script", new SCryptPasswordEncoder());
+        Map<String, PasswordEncoder> encoders = Map.of(
+                ENCODER_ID, new BCryptPasswordEncoder(),
+                "pbkdf2", new Pbkdf2PasswordEncoder(),
+                "argon2", new Argon2PasswordEncoder(),
+                "scrypt", new SCryptPasswordEncoder());
         return new DelegatingPasswordEncoder(ENCODER_ID, encoders, "[", "]");
     }
 //    endregion

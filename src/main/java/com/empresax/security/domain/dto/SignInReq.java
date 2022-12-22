@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class SignInReq implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NotNull(message = "The username or email cannot be null")

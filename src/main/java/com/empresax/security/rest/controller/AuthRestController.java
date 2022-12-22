@@ -36,7 +36,13 @@ public class AuthRestController {
     @GetMapping
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<String> saludo() {
-        return status(HttpStatus.OK).body("Hola");
+        return status(HttpStatus.OK).body("Hola Usuario");
+    }
+
+    @GetMapping("/admin")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<String> saludoAdmin() {
+        return status(HttpStatus.OK).body("Hola Admin");
     }
 
     @PostMapping(value = "/sign-up")

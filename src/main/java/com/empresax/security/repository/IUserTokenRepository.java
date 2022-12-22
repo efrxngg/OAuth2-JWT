@@ -11,6 +11,6 @@ public interface IUserTokenRepository extends JpaRepository<UserTokenEntity, Str
 
     Optional<UserTokenEntity> findByRefreshToken(String refreshToken);
 
-    Optional<UserTokenEntity> deleteByUserUserId(String userId);
+    void deleteByUserUserId(String userId);
 
 }
