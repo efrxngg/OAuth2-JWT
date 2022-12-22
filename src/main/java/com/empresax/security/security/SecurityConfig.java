@@ -69,6 +69,7 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    //region JWT
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.httpBasic()
@@ -94,6 +95,7 @@ public class SecurityConfig {
         converter.setJwtGrantedAuthoritiesConverter(authorityConverter);
         return converter;
     }
+//    endregion
 
     //region RSA CONFIGS
     @Bean
@@ -158,6 +160,7 @@ public class SecurityConfig {
     }
     //endregion
 
+    //    region EXTRA
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -176,6 +179,7 @@ public class SecurityConfig {
         encoders.put("script", new SCryptPasswordEncoder());
         return new DelegatingPasswordEncoder(ENCODER_ID, encoders, "[", "]");
     }
+//    endregion
 
     private static final String[] WITHLIST = {"/v3/api-docs/**", "/swagger-ui/**"};
     private static final String[] PUBLIC_AUTH_URLS = {"/api/v1/auth/sign-up", "/api/v1/auth/sign-in", "/api/v1/auth/refresh"};
