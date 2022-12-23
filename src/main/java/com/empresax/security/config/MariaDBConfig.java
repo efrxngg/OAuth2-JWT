@@ -26,8 +26,7 @@ public class MariaDBConfig {
 
     @Bean
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(getSecurityEmpresaxDataSource());
-        return namedParameterJdbcTemplate;
+        return new NamedParameterJdbcTemplate(getSecurityEmpresaxDataSource());
     }
 
     @Bean
