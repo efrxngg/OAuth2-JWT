@@ -4,18 +4,15 @@ import com.empresax.security.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
+import java.util.UUID;
 
-@Repository
-public interface IUserRepository extends JpaRepository<UserEntity, String> {
+public interface IUserRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findUserByUsername(String username);
 
-    @Query(value = "select * from user where username = :option or email = :option", nativeQuery = true)
+    @Query(value = "select * from user_entity where username = :option or email = :option", nativeQuery = true)
     Optional<UserEntity> findByUsernameOrEmail(@Param("option") String option);
 
-    @Query(value = "select count(*) from user where username = :usn or email = :eml", nativeQuery = true)
-    Integer findByUsernameOrEmail(@Param("usn") String username, @Param("eml") String email);
+    boolean existsByUsernameOrEmail(String username, String email);
 
 }

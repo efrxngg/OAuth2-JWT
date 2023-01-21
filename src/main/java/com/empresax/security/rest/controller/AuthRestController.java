@@ -52,7 +52,7 @@ public class AuthRestController {
 
     @PostMapping(value = "/refresh")
     public ResponseEntity<SignedInUser> getAccessToken(@Valid @RequestBody RefreshToken refreshToken) {
-        return ok(userService.getAccessToken(refreshToken).orElseThrow(InvalidRefreshToken::new));
+        return ok(userService.getAccessToken(refreshToken).get());
     }
 
 }

@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Random;
 
-public class RandomID {
+public class SecurityRandomID {
     private static final Random random = new SecureRandom();
 
     private static String randomKey(int length) {
@@ -12,8 +12,8 @@ public class RandomID {
                 .toString(32)).replace('\u0020', '0');
     }
 
-    public static String generate() {
-        return randomKey(16).toUpperCase();
+    public static String generate(int len) {
+        return randomKey(len).toUpperCase();
     }
 
 }

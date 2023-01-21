@@ -2,15 +2,13 @@ package com.empresax.security.repository;
 
 import com.empresax.security.domain.entity.UserTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
+import java.util.UUID;
 
-@Repository
-public interface IUserTokenRepository extends JpaRepository<UserTokenEntity, String> {
+public interface IUserTokenRepository extends JpaRepository<UserTokenEntity, UUID> {
 
     Optional<UserTokenEntity> findByRefreshToken(String refreshToken);
 
-    void deleteByUserUserId(String userId);
+    void deleteByUserId(UUID userId);
 
 }
