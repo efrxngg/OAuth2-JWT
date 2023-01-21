@@ -10,9 +10,9 @@ import com.empresax.security.repository.IUserRepository;
 import com.empresax.security.repository.IUserTokenRepository;
 import com.empresax.security.security.JwtManager;
 import com.empresax.security.service.IUserService;
-import com.empresax.security.util.RandomID;
+import com.empresax.security.util.SecurityRandomID;
+
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,10 +35,10 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     public Optional<SignedInUser> createUser(UserEntity user) {
 
-        if (userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail()) > 0)
+        if (userRepository.existsByUsernameOrEmail(user.getUsername(), user.getEmail()))
             throw new GenericAlreadyExistsException("Use diferent username or email");
 
-        user.setUserId(RandomID.generate());
+        user.setId(null);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         var userEntity = userRepository.save(user);
 
@@ -57,8 +57,9 @@ public class UserServiceImpl implements IUserService {
                 .password(user.getPassword())
                 .authorities(Objects.nonNull(user.getRole()) ? user.getRole().name() : "")
                 .build());
+                
         return SignedInUser.builder()
-                .userId(user.getUserId())
+                .userId(user.getId().toString())
                 .username(user.getUsername())
                 .accessToken(token)
                 .build();
@@ -75,7 +76,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public SignedInUser getSignedInUser(UserEntity userEntity) {
-        userTokenRepository.deleteByUserUserId(userEntity.getUserId());
+        userTokenRepository.deleteByUserId(userEntity.getId());
         return createSignedUserWithRefreshToken(userEntity);
     }
 
@@ -100,8 +101,8 @@ public class UserServiceImpl implements IUserService {
     }
 
     private String createRefreshToken(UserEntity user) {
-        String token = RandomStringUtils.randomAlphanumeric(128);
-        userTokenRepository.save(new UserTokenEntity(RandomID.generate(), user, token));
+        String token = SecurityRandomID.generate(128);
+        userTokenRepository.save(new UserTokenEntity(null, user, token));
         return token;
     }
 
