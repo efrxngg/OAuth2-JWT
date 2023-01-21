@@ -16,6 +16,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static com.empresax.security.security.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Optional;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,7 +49,8 @@ public class AuthControllerTest {
                 .expectBody(SignedInUser.class)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    refreshToken = new RefreshToken(response.getResponseBody().getRefreshToken());
+                    var aux = Optional.of(response.getResponseBody());
+                    refreshToken = new RefreshToken(aux.get().getRefreshToken());
                 });
     }
 
