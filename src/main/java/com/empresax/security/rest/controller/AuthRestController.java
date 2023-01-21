@@ -29,18 +29,6 @@ public class AuthRestController {
     private IUserService userService;
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping
-    @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity<String> saludo() {
-        return status(HttpStatus.OK).body("Hola Usuario");
-    }
-
-    @GetMapping("/admin")
-    @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity<String> saludoAdmin() {
-        return status(HttpStatus.OK).body("Hola Admin");
-    }
-
     @PostMapping(value = "/sign-up")
     public ResponseEntity<SignedInUser> singUp(@Valid @RequestBody UserEntity user) {
         return status(HttpStatus.CREATED).body(userService.createUser(user)
@@ -60,7 +48,7 @@ public class AuthRestController {
     @DeleteMapping(value = "/sign-out")
     public ResponseEntity<Void> signOut(@Valid @RequestBody RefreshToken refreshToken) {
         userService.removeRefreshToken(refreshToken);
-        return status(HttpStatus.OK).build();
+        return ok().build();
     }
 
     @PostMapping(value = "/refresh")
