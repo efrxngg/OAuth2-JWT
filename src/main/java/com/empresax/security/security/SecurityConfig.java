@@ -5,19 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -36,11 +33,8 @@ import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
-import java.util.Map;
-
 import static com.empresax.security.security.Constants.API_URL_PREFIX;
 import static com.empresax.security.security.Constants.AUTHORITY_PREFIX;
-import static com.empresax.security.security.Constants.ENCODER_ID;
 import static com.empresax.security.security.Constants.ROLE_CLAIM;
 import static com.empresax.security.security.Constants.SIGN_IN;
 import static com.empresax.security.security.Constants.SIGN_OUT;
@@ -48,8 +42,9 @@ import static com.empresax.security.security.Constants.SIGN_UP;
 import static com.empresax.security.security.Constants.TOKEN_REFRESH;
 import static com.empresax.security.security.Constants.WITHLIST;
 
+@Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
@@ -69,14 +64,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.httpBasic()
                 .disable().formLogin()
-                .disable().csrf().ignoringAntMatchers(API_URL_PREFIX)
+                .disable().csrf().ignoringRequestMatchers(API_URL_PREFIX)
                 .and().headers().frameOptions().sameOrigin()
                 .and().cors()
-                .and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
-                .antMatchers(HttpMethod.POST, SIGN_UP, SIGN_IN, TOKEN_REFRESH).permitAll() //auth
-                .antMatchers(HttpMethod.DELETE, SIGN_OUT).permitAll() //auth
-                .antMatchers("/api/v1/auth/admin").hasAuthority(RoleType.ADMIN.getAuthority())
+                .and().authorizeHttpRequests()
+                .requestMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
+                .requestMatchers(HttpMethod.POST, SIGN_UP, SIGN_IN, TOKEN_REFRESH).permitAll() //auth
+                .requestMatchers(HttpMethod.DELETE, SIGN_OUT).permitAll() //auth
+                 .requestMatchers("/api/v1/auth/admin").hasAuthority(RoleType.ADMIN.getAuthority())
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer(auth2Server -> auth2Server.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(getJwtAuthenticationConverter())))
@@ -160,12 +155,7 @@ public class SecurityConfig {
     //    region EXTRA
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        Map<String, PasswordEncoder> encoders = Map.of(
-                ENCODER_ID, new BCryptPasswordEncoder(),
-                "pbkdf2", new Pbkdf2PasswordEncoder(),
-                "argon2", new Argon2PasswordEncoder(),
-                "scrypt", new SCryptPasswordEncoder());
-        return new DelegatingPasswordEncoder(ENCODER_ID, encoders, "[", "]");
+        return new BCryptPasswordEncoder();
     }
 //    endregion
 
