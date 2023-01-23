@@ -26,6 +26,8 @@ keytool -genkey -alias "jwt-sign-key" -keyalg RSA -keystore jwt-keystore.jks -ke
 La línea de comando anterior es un ejemplo de cómo usar el utilitario **keytool** para generar un par de claves RSA con una longitud de 4096 bits y almacenarlas en un archivo de almacén de claves llamado "jwt-keystore.jks". El par de claves se almacena bajo el alias "jwt-sign-key". Esta herramienta ya viene incluida en el JDK
 y sirve para firmar los tokens generados.
 
+Luego en el **application.properties** debes especificar la locacion, la contraseña, la frase y el alias del archivo que generaste
+
 ## Contenido del JWT
 
 - Algoritmo de encriptación utilizado **SHA256**
