@@ -21,8 +21,9 @@ import static org.springframework.http.ResponseEntity.status;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {MismatchedInputException.class})
-    public ResponseEntity<ProblemDetail> globalExceptionHandler(MismatchedInputException e, HttpServletRequest request) {
+    @ExceptionHandler(value = { MismatchedInputException.class })
+    public ResponseEntity<ProblemDetail> globalExceptionHandler(MismatchedInputException e,
+            HttpServletRequest request) {
         var status = HttpStatus.BAD_REQUEST;
         var problemDetail = ProblemDetail.forStatusAndDetail(status, e.getMessage());
         problemDetail.setTitle("Invalid Refresh Token");
@@ -30,8 +31,9 @@ public class GlobalExceptionHandler {
         return status(status).body(problemDetail);
     }
 
-    @ExceptionHandler(value = {MissingFormatArgumentException.class})
-    public ResponseEntity<ProblemDetail> globalMissingErrorHandler(MissingFormatArgumentException e, HttpServletRequest request) {
+    @ExceptionHandler(value = { MissingFormatArgumentException.class })
+    public ResponseEntity<ProblemDetail> globalMissingErrorHandler(MissingFormatArgumentException e,
+            HttpServletRequest request) {
         var status = HttpStatus.BAD_REQUEST;
         var problemDetail = ProblemDetail.forStatusAndDetail(status, e.getMessage());
         problemDetail.setTitle("Invalid Refresh Token");
@@ -39,8 +41,11 @@ public class GlobalExceptionHandler {
         return status(status).body(problemDetail);
     }
 
-    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<ProblemDetail> globalMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+    @ExceptionHandler(value = { MethodArgumentNotValidException.class })
+    public ResponseEntity<ProblemDetail> invalidArgumentExcpetion(
+            MethodArgumentNotValidException e,
+            HttpServletRequest request) {
+                
         StringBuilder msg = new StringBuilder();
         e.getBindingResult().getFieldErrors()
                 .forEach(error -> msg.append(error.getDefaultMessage()).append(", "));
@@ -50,11 +55,13 @@ public class GlobalExceptionHandler {
         var status = HttpStatus.BAD_REQUEST;
         var problemDetail = ProblemDetail.forStatusAndDetail(status, msg.toString());
         problemDetail.setType(URI.create(request.getRequestURL().toString()));
+
         return status(status).body(problemDetail);
     }
 
-    @ExceptionHandler(value = {GenericAlreadyExistsException.class})
-    public ResponseEntity<ProblemDetail> globalGenericAlreadyExistsException(GenericAlreadyExistsException e, HttpServletRequest request) {
+    @ExceptionHandler(value = { GenericAlreadyExistsException.class })
+    public ResponseEntity<ProblemDetail> globalGenericAlreadyExistsException(GenericAlreadyExistsException e,
+            HttpServletRequest request) {
         var status = HttpStatus.BAD_REQUEST;
         var problemDetail = ProblemDetail.forStatusAndDetail(status, e.getMessage());
         problemDetail.setTitle("Invalid Refresh Token");

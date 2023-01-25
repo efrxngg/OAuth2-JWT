@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, WITHLIST).permitAll() //oas3
                 .requestMatchers(HttpMethod.POST, SIGN_UP, SIGN_IN, TOKEN_REFRESH).permitAll() //auth
                 .requestMatchers(HttpMethod.DELETE, SIGN_OUT).permitAll() //auth
-                 .requestMatchers("/api/v1/auth/admin").hasAuthority(RoleType.ADMIN.getAuthority())
+                 .requestMatchers("/api/v1/greetings/admin").hasAuthority(RoleType.ADMIN.getAuthority())
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer(auth2Server -> auth2Server.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(getJwtAuthenticationConverter())))
